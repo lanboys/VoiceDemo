@@ -26,7 +26,7 @@ public class AudioUtils {
 
     private static AudioUtils audioUtils;
 
-    private SpeechSynthesizer mySynthesizer;
+    private SpeechSynthesizer mSpeechSynthesizer;
 
     public AudioUtils() {
     }
@@ -64,17 +64,16 @@ public class AudioUtils {
     public void init(Context context) {
 
         //处理语音合成关键类
-        mySynthesizer = SpeechSynthesizer.createSynthesizer(context, myInitListener);
-        if (mySynthesizer != null) {
-            //设置发音人
-            mySynthesizer.setParameter(SpeechConstant.VOICE_NAME, "xiaoyan");
-            //设置音调
-            mySynthesizer.setParameter(SpeechConstant.PITCH, "50");
-            //设置音量
-            mySynthesizer.setParameter(SpeechConstant.VOLUME, "50");
+        mSpeechSynthesizer = SpeechSynthesizer.createSynthesizer(context, myInitListener);
+        if (mSpeechSynthesizer != null) {
+            setAudioParameter(mSpeechSynthesizer, "xiaoyan", 50, 50, 50);
         } else {
-            Log.e("AudioUtils init", "mySynthesizer == null");
+            Log.e("AudioUtils init", "mSpeechSynthesizer == null");
         }
+    }
+
+    public void speakText(String content) {
+        speakText(content, "xiaoyan", 50, 50, 50);
     }
 
     /**
@@ -83,13 +82,16 @@ public class AudioUtils {
      * 邮箱:344176791@qq.com
      * 创建时间: 2016/8/19 14:39
      */
-    public void speakText(String content) {
-        if (mySynthesizer == null) {
-            Log.e("AudioUtils speakText", "mySynthesizer == null");
+    public void speakText(String content, String voiceName, int pitch, int volume, int speed) {
+
+        if (mSpeechSynthesizer == null) {
+            Log.e("AudioUtils speakText", "mSpeechSynthesizer == null");
             return;
+        } else {
+            setAudioParameter(mSpeechSynthesizer, voiceName, pitch, volume, speed);
         }
 
-        int code = mySynthesizer.startSpeaking(content, new SynthesizerListener() {
+        int code = mSpeechSynthesizer.startSpeaking(content, new SynthesizerListener() {
             @Override
             public void onSpeakBegin() {
 
@@ -125,5 +127,22 @@ public class AudioUtils {
 
             }
         });
+    }
+
+    private static void setAudioParameter(SpeechSynthesizer speechSynthesizer,
+            String voiceName, int pitch, int volume, int speed) {
+        // http://www.xfyun.cn/doccenter/tts
+        // 音量和语速支持0-100细粒度的设置，默认值为50
+
+        //设置发音人
+        speechSynthesizer.setParameter(SpeechConstant.VOICE_NAME, voiceName);
+        //设置音调
+        speechSynthesizer.setParameter(SpeechConstant.PITCH, pitch + "");
+        //设置音量
+        speechSynthesizer.setParameter(SpeechConstant.VOLUME, volume + "");
+        //设置语速
+        speechSynthesizer.setParameter(SpeechConstant.SPEED, speed + "");
+        //设置方言 与发音人有关  xiaomei  会说粤语
+        speechSynthesizer.setParameter(SpeechConstant.ACCENT, "yueyu");
     }
 }
